@@ -33,8 +33,14 @@ if 'AWS_SHARED_CREDENTIALS_FILE' not in os.environ:
 
 sys.path.append("modules")
 for module in all_modules:
-    exec("from %s import *" % module)
+    # Assuming module is a string like 'modules.aws.aws_lambda'
+    module_path = module.replace("\\", ".")  # Replace backslashes with dots
+    imported_module = importlib.import_module(module_path)
 
+    # Import all attributes from the module into the current namespace
+    for attr in dir(imported_module):
+        if not attr.startswith('_'):
+            globals()[attr] = getattr(imported_module, attr)
 
 
 parser = argparse.ArgumentParser()
